@@ -5,8 +5,19 @@ generator client {
     provider = "prisma-client-js"
 }
 
+plugin hooks {
+    provider = '@zenstackhq/tanstack-query'
+    target = 'react'
+    version = 'v5'
+    output = "./src/lib/hooks"
+}
+
+plugin zod {
+    provider = '@core/zod'
+}
+
 datasource db {
-    provider = "sqlite"
+    provider = "mysql"
     // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
@@ -14,16 +25,9 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
+enum Gender {
+    MALE
+    FEMALE
 }
 
 // Necessary for Next auth
@@ -54,15 +58,137 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum Role {
+    USER
+    BUSINESS
+    ADMIN
+}
+
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
+    id            String        @id @default(cuid())
+    name          String
+    email         String        @unique
+    password      String?       @password @omit
     emailVerified DateTime?
-    image         String?
+    image         String?       @db.LongText
+    role          Role          @default(USER)
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+    business      Business?
+    pets          Pet[]
+    appointments  Appointment[]
+
+    // Everyone can signup, and user profile is also publicly readable
+    @@allow('create', true)
+
+    // Only the user can update or delete their own profile, or an admin can
+    @@allow('update,delete', auth().id == this.id || auth().role == ADMIN)
+    @@allow('read', auth().id == this.id || auth() == null)  // Assuming profiles are publicly readable
+}
+
+model Business {
+    id           String            @id @default(uuid())
+    logo         String?           @db.LongText
+    businessName String
+    address      String
+    phoneNumber  String
+    verified     Boolean           @default(false)
+    documents    BusinessDocument?
+    services     Service[]
+    appointments Appointment[]
+    owner        User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    ownerId      String            @unique
+
+    @@allow('create', true)  // Anyone can create a business
+    @@allow('read', true)     // Business info can be read by anyone
+    @@allow('update', auth() == owner || auth().role == ADMIN)  // Only the owner or ADMIN can update
+}
+
+model BusinessDocument {
+    id             String   @id @default(uuid())
+    license        String?  @db.LongText
+    businessPermit String?  @db.LongText
+    certification  String?  @db.LongText
+    business       Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+    businessId     String   @unique
+
+    @@allow('create', true)  // Anyone can create a business document
+    @@allow('read', auth().business.owner == business.owner)  // Only the correct business can read its documents
+}
+
+model Service {
+    id         String    @id @default(uuid())
+    name       String
+    variants   Variant[]
+    business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+    businessId String    @unique
+
+    @@allow('all', true)  // Anyone can create a business document
+}
+
+model Variant {
+    id           String               @id @default(uuid())
+    productId    String
+    service      Service              @relation(fields: [productId], references: [id], onDelete: Cascade)
+    name         String
+    price        Float
+    appointments AppointmentService[]
+
+    @@allow('all', true)  // Anyone can create a business document
+}
+
+model Pet {
+    id           Int           @id @default(autoincrement())
+    image        String        @db.LongText
+    name         String
+    species      String
+    breed        String
+    age          String
+    gender       Gender
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    ownerId      String
+    appointments Appointment[]
+
+    @@allow('read,create', true)
+
+    @@allow('update,delete', auth() == owner)
+}
+
+
+enum Status {
+    PENDING
+    ACCEPTED
+    COMPLETED
+    RESCHEDULED
+}
+
+model Appointment {
+    id         String               @id @default(uuid())
+    datetime   DateTime
+    business   Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+    businessId String
+    status     Status
+    user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId     String               @default(auth().id)
+    pet        Pet                  @relation(fields: [petId], references: [id], onDelete: Cascade)
+    petId      Int
+    totalPrice Int
+    note       String?
+    services   AppointmentService[]
+
+    @@allow('all', true)
+}
+
+model AppointmentService {
+    id            String      @id @default(uuid())
+    appointmentId String
+    variantId     String
+    appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+    variant       Variant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+    @@unique([appointmentId, variantId])
 }
 
 model VerificationToken {
