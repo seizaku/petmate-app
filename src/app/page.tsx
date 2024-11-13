@@ -7,8 +7,8 @@ import { AppLoader } from "~/components/app";
 import { useFindFirstUser } from "~/lib/hooks";
 
 export default function Root() {
-  const { status: sessionStatus } = useSession();
-  const { data: user, status: fetchUserStatus } = useFindFirstUser();
+  const { data: user } = useFindFirstUser();
+  const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -16,12 +16,22 @@ export default function Root() {
       router.push("/sign-in");
       return;
     }
-    console.log(user);
 
-    if (sessionStatus == "authenticated" && fetchUserStatus == "success") {
-      router.push(`${user?.role.toLowerCase()}/home`);
+    if (status === "loading") {
+      // Do nothing, just wait for authentication state to settle
+      return;
     }
-  }, [sessionStatus]);
+
+    if (!user?.role) {
+      // If role is undefined, redirect to an error page or show a loading indicator
+      router.push("/error");
+      return;
+    }
+
+    if (status === "authenticated") {
+      router.push(`${user.role.toLowerCase()}/home`);
+    }
+  }, [status, user?.role]);
 
   if (status === "loading") {
     return <AppLoader />;
