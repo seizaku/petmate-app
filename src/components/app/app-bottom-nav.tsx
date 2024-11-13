@@ -18,7 +18,7 @@ const AppBottomNav = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 w-full border-t bg-background p-4">
-      <ul className="flex place-items-center justify-around">
+      <ul className="grid grid-cols-3 place-items-center justify-around">
         {user?.role == "USER" &&
           appConfig.navigation.user.map((item) => {
             const isActive = path == item.href;
