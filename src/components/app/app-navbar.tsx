@@ -4,7 +4,7 @@ import { Button, buttonVariants } from "~/components/ui/button";
 import { FaChevronLeft } from "react-icons/fa6";
 
 type AppNavbar = {
-  href?: string;
+  href: string;
   title: string;
   rightAction?: boolean;
   rightActionIcon?: ReactNode;
@@ -19,10 +19,10 @@ const AppNavbar = ({
   rightActionFn,
 }: AppNavbar) => {
   return (
-    <div className="sticky left-0 top-0 mb-6">
+    <div className="mb-6 bg-background">
       <div className="relative flex items-center justify-center pb-4 text-center">
         <Link
-          href={href ?? "/home"}
+          href={href}
           className={buttonVariants({
             variant: "secondary",
             className: "absolute left-0 top-0",
