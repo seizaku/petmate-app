@@ -65,18 +65,19 @@ enum Role {
 }
 
 model User {
-    id            String        @id @default(cuid())
+    id            String         @id @default(cuid())
     name          String
-    email         String        @unique
-    password      String?       @password @omit
+    email         String         @unique
+    password      String?        @password @omit
     emailVerified DateTime?
-    image         String?       @db.LongText
-    role          Role          @default(USER)
+    image         String?        @db.LongText
+    role          Role           @default(USER)
     accounts      Account[]
     sessions      Session[]
     business      Business?
     pets          Pet[]
     appointments  Appointment[]
+    notifications Notification[]
 
     // Everyone can signup, and user profile is also publicly readable
     @@allow('create', true)
@@ -87,17 +88,20 @@ model User {
 }
 
 model Business {
-    id           String            @id @default(uuid())
-    logo         String?           @db.LongText
-    businessName String
-    address      String
-    phoneNumber  String
-    verified     Boolean           @default(false)
-    documents    BusinessDocument?
-    services     Service[]
-    appointments Appointment[]
-    owner        User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-    ownerId      String            @unique
+    id            String            @id @default(uuid())
+    logo          String?           @db.LongText
+    businessName  String
+    address       String
+    phoneNumber   String
+    verified      Boolean           @default(false)
+    description   String?
+    documents     BusinessDocument?
+    services      Service[]
+    appointments  Appointment[]
+    owner         User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    ownerId       String            @unique
+    timeslots     TimeSlot[]
+    notifications Notification[]
 
     @@allow('create', true)  // Anyone can create a business
     @@allow('read', true)     // Business info can be read by anyone
@@ -158,10 +162,13 @@ model Pet {
 
 
 enum Status {
-    PENDING
-    ACCEPTED
-    COMPLETED
-    RESCHEDULED
+    PENDING         // Appointment is awaiting approval or confirmation
+    APPROVED        // Appointment is approved but not yet scheduled
+    SCHEDULED       // Appointment has been scheduled
+    COMPLETED       // Appointment has been completed
+    RESCHEDULED     // Appointment has been rescheduled
+    CANCELLED       // Appointment has been cancelled
+    DECLINED        // Appointment request was declined by the user or provider
 }
 
 model Appointment {
@@ -181,6 +188,16 @@ model Appointment {
     @@allow('all', true)
 }
 
+model TimeSlot {
+    id         String   @id @default(uuid())
+    time       String
+    business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+    businessId String
+
+    @@unique([time, businessId])  // Enforces unique time per business
+    @@allow('all', true)
+}
+
 model AppointmentService {
     id            String      @id @default(uuid())
     appointmentId String
@@ -189,7 +206,30 @@ model AppointmentService {
     variant       Variant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
     @@unique([appointmentId, variantId])
+    @@allow('all', true)
 }
+
+enum NotificationType {
+    INFO
+    WARNING
+    REMINDER
+}
+
+model Notification {
+    id              String           @id @default(uuid())
+    userMessage     String?    // Message specific to users
+    businessMessage String?   // Message specific to businesses
+    type            NotificationType     // Type of notification, e.g., "info", "warning", "reminder"
+    createdAt       DateTime         @default(now())
+    readAt          DateTime?  // Timestamp for when the notification was read (null if unread)
+    user            User?            @relation(fields: [userId], references: [id])
+    userId          String?
+    business        Business?        @relation(fields: [businessId], references: [id])
+    businessId      String?
+
+    @@allow('all', true)
+}
+
 
 model VerificationToken {
     identifier String

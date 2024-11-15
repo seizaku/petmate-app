@@ -25,9 +25,18 @@ enum Role {
 
 enum Status {
   PENDING
-  ACCEPTED
+  APPROVED
+  SCHEDULED
   COMPLETED
   RESCHEDULED
+  CANCELLED
+  DECLINED
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  REMINDER
 }
 
 model Account {
@@ -58,32 +67,36 @@ model Session {
 }
 
 model User {
-  id            String        @id() @default(cuid())
+  id            String         @id() @default(cuid())
   name          String
-  email         String        @unique()
+  email         String         @unique()
   password      String?
   emailVerified DateTime?
-  image         String?       @db.LongText()
-  role          Role          @default(USER)
+  image         String?        @db.LongText()
+  role          Role           @default(USER)
   accounts      Account[]
   sessions      Session[]
   business      Business?
   pets          Pet[]
   appointments  Appointment[]
+  notifications Notification[]
 }
 
 model Business {
-  id           String            @id() @default(uuid())
-  logo         String?           @db.LongText()
-  businessName String
-  address      String
-  phoneNumber  String
-  verified     Boolean           @default(false)
-  documents    BusinessDocument?
-  services     Service[]
-  appointments Appointment[]
-  owner        User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId      String            @unique()
+  id            String            @id() @default(uuid())
+  logo          String?           @db.LongText()
+  businessName  String
+  address       String
+  phoneNumber   String
+  verified      Boolean           @default(false)
+  description   String?
+  documents     BusinessDocument?
+  services      Service[]
+  appointments  Appointment[]
+  owner         User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId       String            @unique()
+  timeslots     TimeSlot[]
+  notifications Notification[]
 }
 
 model BusinessDocument {
@@ -142,6 +155,15 @@ model Appointment {
   services   AppointmentService[]
 }
 
+model TimeSlot {
+  id         String   @id() @default(uuid())
+  time       String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  businessId String
+
+  @@unique([time, businessId])
+}
+
 model AppointmentService {
   id            String      @id() @default(uuid())
   appointmentId String
@@ -150,6 +172,19 @@ model AppointmentService {
   variant       Variant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   @@unique([appointmentId, variantId])
+}
+
+model Notification {
+  id              String           @id() @default(uuid())
+  userMessage     String?
+  businessMessage String?
+  type            NotificationType
+  createdAt       DateTime         @default(now())
+  readAt          DateTime?
+  user            User?            @relation(fields: [userId], references: [id])
+  userId          String?
+  business        Business?        @relation(fields: [businessId], references: [id])
+  businessId      String?
 }
 
 model VerificationToken {
