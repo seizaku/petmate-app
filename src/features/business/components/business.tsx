@@ -22,7 +22,7 @@ import {
   SelectItem,
 } from "~/components/ui/select";
 import { Calendar } from "~/components/ui/calendar";
-import { GoogleMapEmbed } from "~/features/gmap/components/page";
+import { GoogleMapEmbed } from "~/features/gmap/components/map-embed";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Textarea } from "~/components/ui/textarea";
 
@@ -157,6 +157,9 @@ const Business = ({ businessId }: { businessId: string }) => {
           </div>
         </CardContent>
       </Card>
+      <Card className="mb-2 w-full">
+        <CardHeader>{business?.description}</CardHeader>
+      </Card>
 
       <Tabs defaultValue="services" className="mb-4 w-full">
         <TabsList className="grid w-full grid-cols-2">
@@ -182,12 +185,8 @@ const Business = ({ businessId }: { businessId: string }) => {
                         <Checkbox
                           id={variant.id}
                           value={variant.id}
-                          checked={selectedServices.includes(
-                            variant.id as string,
-                          )}
-                          onCheckedChange={() =>
-                            toggleService(variant.id as string)
-                          }
+                          checked={selectedServices.includes(variant.id)}
+                          onCheckedChange={() => toggleService(variant.id)}
                           className="mr-2 border-zinc-300"
                         />
                         <label
