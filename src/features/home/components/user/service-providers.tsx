@@ -4,19 +4,22 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "~/components/ui/card";
-import { ScrollBar } from "~/components/ui/scroll-area";
 import { useFindManyBusiness } from "~/lib/hooks";
 
 const BusinessSlider = () => {
-  const { data: businesses } = useFindManyBusiness();
+  const { data: businesses } = useFindManyBusiness({
+    take: 3,
+  });
   return (
     <section>
-      <h1 className="mb-4 text-lg font-bold text-foreground">Near You</h1>
-      <ScrollArea className="w-full whitespace-nowrap rounded-md">
-        <div className="flex w-max space-x-4 pb-4">
+      <h1 className="mb-4 text-lg font-bold text-foreground">
+        Service Providers
+      </h1>
+      <ScrollArea className="mb-2 w-full whitespace-nowrap rounded-md">
+        <div className="flex flex-col gap-2">
           {businesses?.map((business) => (
             <Link href={`./business/${business.id}`} key={business.id}>
-              <Card className="max-w-[360px]">
+              <Card className="w-full">
                 <CardContent className="p-0">
                   <div className="flex items-center p-4">
                     <Image
@@ -38,7 +41,6 @@ const BusinessSlider = () => {
             </Link>
           ))}
         </div>
-        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </section>
   );
