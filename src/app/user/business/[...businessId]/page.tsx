@@ -1,5 +1,5 @@
 import React from "react";
-import { AppContainer, AppNavbar, AppBottomNav } from "~/components/app";
+import { AppContainer, AppNavbar } from "~/components/app";
 import { Business } from "~/features/business/components/business";
 
 interface BusinessPage {
