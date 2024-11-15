@@ -10,7 +10,7 @@ import { useFindManyBusiness } from "~/lib/hooks";
 const BusinessSlider = () => {
   const { data: businesses } = useFindManyBusiness();
   return (
-    <section className="mb-4">
+    <section>
       <h1 className="mb-4 text-lg font-bold text-foreground">Near You</h1>
       <ScrollArea className="w-full whitespace-nowrap rounded-md">
         <div className="flex w-max space-x-4 pb-4">
