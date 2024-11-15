@@ -92,6 +92,8 @@ model Business {
     logo          String?           @db.LongText
     businessName  String
     address       String
+    latitude      String
+    longitude     String
     phoneNumber   String
     verified      Boolean           @default(false)
     description   String?
@@ -125,7 +127,7 @@ model Service {
     name       String
     variants   Variant[]
     business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-    businessId String    @unique
+    businessId String
 
     @@allow('all', true)  // Anyone can create a business document
 }
