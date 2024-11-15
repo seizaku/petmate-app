@@ -34,13 +34,24 @@ import { buttonVariants } from "~/components/ui/button";
 export default function MyAppointmentsPage() {
   const { data: session } = useSession();
   const { data: user } = useFindFirstUser({
-    where: { id: session?.user.id },
+    where: {
+      id: session?.user.id,
+    },
     include: {
       business: {
         include: {
           appointments: {
             include: {
               pet: true,
+            },
+          },
+        },
+        where: {
+          appointments: {
+            some: {
+              status: {
+                not: "COMPLETED",
+              },
             },
           },
         },
