@@ -1,4 +1,4 @@
-import { type User } from "@prisma/client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { enhance } from "@zenstackhq/runtime";
 import { NextRequestHandler } from "@zenstackhq/server/next";
 import { auth } from "~/server/auth";
@@ -7,7 +7,7 @@ import { db } from "~/server/db";
 // create an enhanced Prisma client with user context
 async function getPrisma() {
   const session = await auth();
-  return enhance(db, { user: session?.user as User });
+  return enhance(db, { user: session?.user as any });
 }
 
 const handler = NextRequestHandler({ getPrisma, useAppDir: true });
