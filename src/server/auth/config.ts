@@ -6,7 +6,7 @@ import { type User } from "next-auth";
 
 import { db } from "~/server/db";
 import { compare } from "bcryptjs";
-import { Business } from "@prisma/client";
+import { type Business } from "@prisma/client";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`

@@ -2,8 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { getMonth, getYear } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FaDollarSign } from "react-icons/fa6";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useFindFirstUser } from "~/lib/hooks";
@@ -28,26 +27,26 @@ const TotalRevenue = () => {
     },
   });
 
-  // Function to calculate monthly revenue based on completed appointments
-  const calculateMonthlyRevenue = (
-    transactions: any,
-    year: number,
-    month: number,
-  ) => {
-    return transactions
-      .filter((transaction: any) => {
-        const transactionDate = new Date(transaction.datetime);
-        return (
-          transaction.status === "COMPLETED" &&
-          transactionDate.getFullYear() === year &&
-          transactionDate.getMonth() === month
-        );
-      })
-      .reduce(
-        (total: number, transaction: any) => total + transaction.totalPrice,
-        0,
-      );
-  };
+  // // Function to calculate monthly revenue based on completed appointments
+  // const calculateMonthlyRevenue = (
+  //   transactions: any,
+  //   year: number,
+  //   month: number,
+  // ) => {
+  //   return transactions
+  //     .filter((transaction: any) => {
+  //       const transactionDate = new Date(transaction.datetime);
+  //       return (
+  //         transaction.status === "COMPLETED" &&
+  //         transactionDate.getFullYear() === year &&
+  //         transactionDate.getMonth() === month
+  //       );
+  //     })
+  //     .reduce(
+  //       (total: number, transaction: any) => total + transaction.totalPrice,
+  //       0,
+  //     );
+  // };
 
   // // State to hold the calculated monthly revenue
   // const [monthlyRevenue, setMonthlyRevenue] = useState(0);

@@ -1,4 +1,4 @@
-import { Business } from "@prisma/client";
+import { type Business } from "@prisma/client";
 import { env } from "~/env"
 
 // Haversine formula to calculate distance between two coordinates
