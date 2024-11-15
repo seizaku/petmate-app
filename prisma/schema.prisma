@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -72,7 +72,7 @@ model User {
   email         String         @unique()
   password      String?
   emailVerified DateTime?
-  image         String?        @db.LongText()
+  image         String?        @db.Text()
   role          Role           @default(USER)
   accounts      Account[]
   sessions      Session[]
@@ -84,7 +84,7 @@ model User {
 
 model Business {
   id            String            @id() @default(uuid())
-  logo          String?           @db.LongText()
+  logo          String?           @db.Text()
   businessName  String
   address       String
   latitude      String
@@ -103,9 +103,9 @@ model Business {
 
 model BusinessDocument {
   id             String   @id() @default(uuid())
-  license        String?  @db.LongText()
-  businessPermit String?  @db.LongText()
-  certification  String?  @db.LongText()
+  license        String?  @db.Text()
+  businessPermit String?  @db.Text()
+  certification  String?  @db.Text()
   business       Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   businessId     String   @unique()
 }
@@ -129,7 +129,7 @@ model Variant {
 
 model Pet {
   id           Int           @id() @default(autoincrement())
-  image        String        @db.LongText()
+  image        String        @db.Text()
   name         String
   species      String
   breed        String
