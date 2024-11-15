@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React from "react";
 import { AppContainer, AppNavbar, AppBottomNav } from "~/components/app";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { FaChevronRight } from "react-icons/fa6";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -33,7 +33,9 @@ export default function ProfilePage() {
       <p className="mb-4 text-center">{user?.email}</p>
 
       <div className="mb-8 flex justify-center">
-        <Button size={"lg"}>Edit Profile</Button>
+        <Link className={buttonVariants()} href={"/business/profile/edit"}>
+          Edit Profile
+        </Link>
       </div>
 
       <h1 className="mb-4 px-6 font-medium">Services & Pricing</h1>
