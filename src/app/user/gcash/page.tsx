@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
 import Link from "next/link";
 import React from "react";
 import { buttonVariants } from "~/components/ui/button";

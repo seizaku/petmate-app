@@ -4,11 +4,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
-import {
-  useCreateNotification,
-  useFindFirstUser,
-  useUpdateAppointment,
-} from "~/lib/hooks";
+import { useFindFirstUser, useUpdateAppointment } from "~/lib/hooks";
 import { AppBottomNav, AppContainer, AppNavbar } from "~/components/app";
 import { Badge } from "~/components/ui/badge";
 import {
@@ -31,7 +27,6 @@ import { Button, buttonVariants } from "~/components/ui/button";
 import Link from "next/link";
 import { type Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { error } from "console";
 
 export default function MyAppointmentsPage() {
   const { data: session } = useSession();
@@ -49,12 +44,10 @@ export default function MyAppointmentsPage() {
   const router = useRouter();
 
   const { mutateAsync: updateAppointment } = useUpdateAppointment();
-  const { mutateAsync: createNotification } = useCreateNotification();
   const [selectedAppointment, setSelectedAppointment] = useState<string | null>(
     null,
   );
   const [newStatus, setNewStatus] = useState<Status | null>(null);
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   const handleStatusChange = async () => {
     if (selectedAppointment && newStatus) {
@@ -115,7 +108,6 @@ export default function MyAppointmentsPage() {
                   {appointment.status == "APPROVED" ? (
                     <Button
                       onClick={async () => {
-                        setSelectedUser(appointment.businessId);
                         await handlePayment(appointment.id).catch((error) =>
                           console.log(error),
                         );
@@ -130,7 +122,6 @@ export default function MyAppointmentsPage() {
                       )}
                       onValueChange={(value: Status) => {
                         setSelectedAppointment(appointment.id);
-                        setSelectedUser(appointment.businessId);
                         setNewStatus(value);
                       }}
                     >
