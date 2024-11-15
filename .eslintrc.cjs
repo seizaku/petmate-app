@@ -13,6 +13,7 @@ const config = {
     "plugin:@typescript-eslint/stylistic-type-checked"
   ],
   "rules": {
+    "react-hooks/exhaustive-deps": "off",
     "@typescript-eslint/prefer-promise-reject-errors": "off",
     "@typescript-eslint/no-require-imports": "off",
     "@typescript-eslint/no-unsafe-call": "off",
