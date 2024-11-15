@@ -7,7 +7,6 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardContent,
   CardDescription,
 } from "~/components/ui/card";
 import { appConfig } from "~/config/app-config";
@@ -24,7 +23,7 @@ export default function HomePage() {
       <HomeNavbar />
 
       <Link
-        href={"/search"}
+        href={"/user/search"}
         className={buttonVariants({
           variant: "outline",
           size: "lg",
