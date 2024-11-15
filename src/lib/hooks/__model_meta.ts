@@ -575,9 +575,6 @@ const metadata = {
                 id: {
                     name: "id",
                     fields: ["id"]
-                }, time_businessId: {
-                    name: "time_businessId",
-                    fields: ["time", "businessId"]
                 },
             }
             ,

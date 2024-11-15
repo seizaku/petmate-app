@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -162,8 +162,6 @@ model TimeSlot {
   time       String
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   businessId String
-
-  @@unique([time, businessId])
 }
 
 model AppointmentService {

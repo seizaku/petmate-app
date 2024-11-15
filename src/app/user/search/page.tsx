@@ -81,7 +81,7 @@ export default function SearchPage() {
       </Select>
 
       {/* Clinic Cards */}
-      <section className="mt-4 flex flex-col pb-12">
+      <section className="mt-4 flex flex-col gap-4 pb-12">
         {filteredClinics?.map((business) => (
           <Link href={`/user/business/${business.id}`} key={business.id}>
             <Card className="w-full">

@@ -17,14 +17,8 @@ export default function Root() {
       return;
     }
 
-    if (status === "loading") {
+    if (status === "loading" || !user?.role) {
       // Do nothing, just wait for authentication state to settle
-      return;
-    }
-
-    if (!user?.role) {
-      // If role is undefined, redirect to an error page or show a loading indicator
-      router.push("/error");
       return;
     }
 
