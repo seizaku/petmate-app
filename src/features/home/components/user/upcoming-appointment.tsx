@@ -36,11 +36,12 @@ const UpcomingAppointment = () => {
         <CardTitle>Upcoming Appointment</CardTitle>
       </CardHeader>
 
-      {user?.appointments.length && (
+      {!!user?.appointments.length && (
         <>
           <CardContent>
             <h1 className="text-2xl font-bold">
-              {format(user?.appointments?.[0]?.datetime!, "MMMM dd, h:mm a")}{" "}
+              {user?.appointments?.[0]?.datetime &&
+                format(user?.appointments?.[0]?.datetime, "MMMM dd, h:mm a")}
             </h1>
             <p>{user?.appointments?.[0]?.business.businessName}</p>
           </CardContent>
