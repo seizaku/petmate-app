@@ -11,14 +11,13 @@ import {
 import { appConfig } from "~/config/app-config";
 import { HomeNavbar } from "~/features/home/components/navbar";
 import { AppointmentsToday } from "~/features/home/components/business/appointments-today";
-import { TotalRevenue } from "~/features/home/components/business/total-revenue";
+import { UpcomingAppointment } from "~/features/home/components/business/upcoming-appointment";
 
 export default function HomePage() {
   return (
     <AppContainer>
       <HomeNavbar />
-
-      <TotalRevenue />
+      <UpcomingAppointment />
 
       <AppointmentsToday />
 

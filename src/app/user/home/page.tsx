@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { FaChevronRight, FaMagnifyingGlass } from "react-icons/fa6";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 import { AppContainer } from "~/components/app";
 import { AppBottomNav } from "~/components/app/app-bottom-nav";
 import { Button, buttonVariants } from "~/components/ui/button";
@@ -9,13 +8,15 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardFooter,
   CardDescription,
 } from "~/components/ui/card";
 import { appConfig } from "~/config/app-config";
 import { HomeNavbar } from "~/features/home/components/navbar";
 import { BusinessSlider } from "~/features/home/components/user/service-providers";
 import { UpcomingAppointment } from "~/features/home/components/user/upcoming-appointment";
+import { getRandomTips } from "~/features/pet-tips/lib/pet-tips";
+
+export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (
@@ -62,19 +63,11 @@ export default function HomePage() {
 
       <BusinessSlider />
 
-      <Card className="bg-zinc-900 text-white transition-all ease-in-out hover:bg-muted hover:text-foreground">
+      <Card className="bg-zinc-900 text-white">
         <CardHeader>
-          <CardTitle>Pet Care Tip</CardTitle>
+          <CardTitle className="mb-4">Pet Care Tip</CardTitle>
+          {getRandomTips()}
         </CardHeader>
-        <CardContent>
-          {`Regular brushing not only keeps your pet's coat healthy but also
-  strengthens your bond. Aim for a few minutes of brushing each day!`}
-        </CardContent>
-        <CardFooter>
-          <Link href="" className="flex items-center gap-2">
-            More Tips <FaChevronRight className="h-3 w-3" />
-          </Link>
-        </CardFooter>
       </Card>
       <AppBottomNav />
     </AppContainer>
