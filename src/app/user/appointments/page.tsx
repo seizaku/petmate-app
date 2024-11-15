@@ -1,82 +1,185 @@
 "use client";
-import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "~/components/ui/card";
-import { FaCalendar, FaClock, FaPlus } from "react-icons/fa6";
+import React, { useState } from "react";
+import { Card, CardContent } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { format } from "date-fns";
-import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useFindFirstUser } from "~/lib/hooks";
+import {
+  useCreateNotification,
+  useFindFirstUser,
+  useUpdateAppointment,
+} from "~/lib/hooks";
 import { AppBottomNav, AppContainer, AppNavbar } from "~/components/app";
+import { Badge } from "~/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import { Button, buttonVariants } from "~/components/ui/button";
+import Link from "next/link";
+import { type Status } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 export default function MyAppointmentsPage() {
   const { data: session } = useSession();
   const { data: user } = useFindFirstUser({
-    where: {
-      id: session?.user.id,
-    },
+    where: { id: session?.user.id },
     include: {
       appointments: {
         include: {
           pet: true,
         },
       },
-      business: {
-        include: {
-          appointments: {
-            include: {
-              pet: true,
-            },
-          },
-        },
-      },
     },
   });
 
+  const router = useRouter();
+
+  const { mutateAsync: updateAppointment } = useUpdateAppointment();
+  const { mutateAsync: createNotification } = useCreateNotification();
+  const [selectedAppointment, setSelectedAppointment] = useState<string | null>(
+    null,
+  );
+  const [newStatus, setNewStatus] = useState<Status | null>(null);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+
+  const handleStatusChange = async () => {
+    if (selectedAppointment && newStatus) {
+      await updateAppointment({
+        data: { status: newStatus },
+        where: { id: selectedAppointment },
+      });
+    }
+  };
+
+  const handlePayment = async (id: string, businessId: string) => {
+    await updateAppointment({
+      data: { status: "SCHEDULED" },
+      where: { id },
+    });
+
+    await createNotification({
+      data: {
+        userMessage: `${user?.name} has paid the fee`,
+        type: "REMINDER",
+        business: {
+          connect: {
+            id: businessId,
+          },
+        },
+      },
+    });
+
+    router.push("/user/gcash");
+  };
+
   return (
     <AppContainer>
-      <AppNavbar title="My Booking" href="/user/home" />
+      <AppNavbar title="My Bookings" href="/user/home" />
 
       <div className="grid gap-2">
-        {user?.appointments.map((appointment) => (
-          <Link href={`/appointments/${appointment.id}`} key={appointment.id}>
-            <Card className="shadow-none">
-              <CardContent className="py-4">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16 rounded-xl">
-                    <AvatarFallback className="rounded-xl"></AvatarFallback>
+        {user?.appointments
+          ?.sort((a, b) => b.datetime.getTime() - a.datetime.getTime())
+          .map((appointment) => (
+            <Card key={appointment.id} className="overflow-hidden">
+              <CardContent className="p-3">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-12 w-12 rounded-xl border-2 border-white shadow-sm">
                     <AvatarImage
-                      className="object-cover"
                       src={appointment.pet.image}
+                      alt={`${appointment.pet.name}'s picture`}
                     />
+                    <AvatarFallback>{appointment.pet.name[0]}</AvatarFallback>
                   </Avatar>
-                  <div className="space-y-1.5">
-                    <CardTitle>{appointment.pet.name}</CardTitle>
-                    <div className="grid">
-                      <CardDescription className="flex items-center gap-2 text-xs">
-                        <FaCalendar className="h-3 w-3" />
-                        <span>
-                          {format(appointment.datetime, "MMMM d, yyyy")}
-                        </span>
-                      </CardDescription>
-
-                      <CardDescription className="flex items-center gap-2">
-                        <FaClock className="h-3 w-3" />
-                        <span>{format(appointment.datetime, "hh:mm a")}</span>
-                      </CardDescription>
+                  <div className="flex-grow">
+                    <h2 className="font-medium">{appointment.pet.name}</h2>
+                    <div className="flex items-center text-xs text-gray-500">
+                      <span className="mr-3">
+                        {format(appointment.datetime, "MMMM dd, yyyy")}
+                      </span>
+                      <span>{format(appointment.datetime, "hh:mm a")}</span>
                     </div>
                   </div>
+                  <Badge variant={"outline"} className={`shadow-none`}>
+                    {appointment.status}
+                  </Badge>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <Link
+                    href={`./appointments/${appointment.id}`}
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    View Details
+                  </Link>
+                  {appointment.status == "APPROVED" ? (
+                    <Button
+                      onClick={() =>
+                        handlePayment(appointment.id, appointment.businessId)
+                      }
+                    >
+                      Pay Fee
+                    </Button>
+                  ) : (
+                    <Select
+                      disabled={["COMPLETED", "DECLINED", "CANCELLED"].includes(
+                        appointment.status,
+                      )}
+                      onValueChange={(value: Status) => {
+                        setSelectedAppointment(appointment.id);
+                        setSelectedUser(appointment.userId);
+                        setNewStatus(value);
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Change status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["SCHEDULED", "PENDING"].includes(
+                          appointment.status,
+                        ) && <SelectItem value="CANCELLED">Cancel</SelectItem>}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
               </CardContent>
             </Card>
-          </Link>
-        ))}
+          ))}
       </div>
+
+      <AlertDialog
+        open={selectedAppointment !== null}
+        onOpenChange={() => setSelectedAppointment(null)}
+      >
+        <AlertDialogTrigger />
+        <AlertDialogContent className="max-w-sm rounded-xl">
+          <AlertDialogTitle>Confirm Status Change</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to change the status of this appointment to{" "}
+            <span className="font-bold capitalize">
+              {newStatus?.toLowerCase()}
+            </span>
+            ?
+          </AlertDialogDescription>
+          <div className="flex items-center justify-end space-x-4">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="mt-2" onClick={handleStatusChange}>
+              Confirm
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AppBottomNav />
     </AppContainer>
