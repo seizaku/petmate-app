@@ -22,6 +22,16 @@ import {
   useUpdateService,
 } from "~/lib/hooks";
 import { useSession } from "next-auth/react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { vetServices } from "~/features/services/constants/service";
 
 type Service = {
   id?: string;
@@ -198,14 +208,31 @@ export default function ServicesPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="service-name">Service Name</Label>
-              <Input
-                id="service-name"
+
+              <Select
                 value={newService.name}
-                onChange={(e) =>
-                  setNewService({ ...newService, name: e.target.value })
+                onValueChange={(value) =>
+                  setNewService({ ...newService, name: value })
                 }
-                placeholder="Enter service name"
-              />
+              >
+                <SelectTrigger className="mt-2 bg-muted">
+                  <SelectValue placeholder="Choose a service" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(vetServices).map(([category, services]) => (
+                    <SelectGroup key={category}>
+                      <SelectLabel className="capitalize">
+                        {category.replace(/([A-Z])/g, " $1")}{" "}
+                      </SelectLabel>
+                      {services.map((service, index) => (
+                        <SelectItem key={`${service}-${index}`} value={service}>
+                          {service}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
               <Label>Price Variants</Label>
