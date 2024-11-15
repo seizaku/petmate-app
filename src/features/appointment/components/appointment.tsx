@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { Button } from "~/components/ui/button";
 import { useFindFirstAppointment } from "~/lib/hooks";
 import { Badge } from "~/components/ui/badge";
+import { GoogleMapEmbed } from "~/features/gmap/components/map-embed";
 
 export default function Appointment({
   appointmentId,
@@ -108,11 +109,16 @@ export default function Appointment({
           ))}
         </CardHeader>
       </Card>
-      <Card className="mb-4">
-        <CardHeader>
-          <p>{appointment?.note}</p>
-        </CardHeader>
-      </Card>
+      {appointment?.note?.length && (
+        <Card className="mb-4">
+          <CardHeader>
+            <p>{appointment?.note}</p>
+          </CardHeader>
+        </Card>
+      )}
+      <GoogleMapEmbed
+        address={appointment?.business.address ?? "Zamboanga City"}
+      />
       <Card className="bg-gradient mb-4 bg-gradient-to-r from-primary via-primary/90 to-primary/70 text-white">
         <CardHeader>
           <CardTitle>
