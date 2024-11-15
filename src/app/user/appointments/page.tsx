@@ -31,6 +31,7 @@ import { Button, buttonVariants } from "~/components/ui/button";
 import Link from "next/link";
 import { type Status } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { error } from "console";
 
 export default function MyAppointmentsPage() {
   const { data: session } = useSession();
@@ -64,22 +65,10 @@ export default function MyAppointmentsPage() {
     }
   };
 
-  const handlePayment = async (id: string, businessId: string) => {
+  const handlePayment = async (id: string) => {
     await updateAppointment({
       data: { status: "SCHEDULED" },
       where: { id },
-    });
-
-    await createNotification({
-      data: {
-        userMessage: `${user?.name} has paid the fee`,
-        type: "REMINDER",
-        business: {
-          connect: {
-            id: businessId,
-          },
-        },
-      },
     });
 
     router.push("/user/gcash");
@@ -125,9 +114,12 @@ export default function MyAppointmentsPage() {
                   </Link>
                   {appointment.status == "APPROVED" ? (
                     <Button
-                      onClick={() =>
-                        handlePayment(appointment.id, appointment.businessId)
-                      }
+                      onClick={async () => {
+                        setSelectedUser(appointment.businessId);
+                        await handlePayment(appointment.id).catch((error) =>
+                          console.log(error),
+                        );
+                      }}
                     >
                       Pay Fee
                     </Button>
@@ -138,7 +130,7 @@ export default function MyAppointmentsPage() {
                       )}
                       onValueChange={(value: Status) => {
                         setSelectedAppointment(appointment.id);
-                        setSelectedUser(appointment.userId);
+                        setSelectedUser(appointment.businessId);
                         setNewStatus(value);
                       }}
                     >
