@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.petmate_app.twa",
+        "sha256_cert_fingerprints": ["94:E6:DD:AE:47:45:76:E7:50:B9:FF:ED:82:E8:61:7D:09:48:59:A3:B6:25:6E:00:3D:4A:10:27:F6:B5:E0:D3"]
+      }
+    }]
