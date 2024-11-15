@@ -24,6 +24,7 @@ import { useState } from "react";
 import { Card, CardContent } from "~/components/ui/card";
 import Image from "next/image";
 import { toast } from "sonner";
+import { Textarea } from "~/components/ui/textarea";
 
 const BusinessSignUpForm = () => {
   const { mutateAsync: createUser } = useCreateUser();
@@ -42,6 +43,7 @@ const BusinessSignUpForm = () => {
     defaultValues: {
       logo: "",
       name: "",
+      description: "",
       businessName: "",
       address: "",
       phoneNumber: "",
@@ -67,6 +69,7 @@ const BusinessSignUpForm = () => {
           business: {
             create: {
               logo: data.logo,
+              description: data.description,
               businessName: data.businessName,
               phoneNumber: data.phoneNumber,
               address: data.address,
@@ -162,6 +165,25 @@ const BusinessSignUpForm = () => {
                         form.setValue("businessName", e.currentTarget.value);
                       }}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={5}
+                      placeholder="Describe your business"
+                      {...field}
+                      value={form.getValues("description") ?? ""}
+                    ></Textarea>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

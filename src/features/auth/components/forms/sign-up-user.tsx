@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { type z } from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -21,6 +21,8 @@ import { UserCreateSchema } from "@zenstackhq/runtime/zod/models";
 import { fileToBase64 } from "~/lib/utils";
 import { toast } from "sonner";
 import { type User } from "@prisma/client";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
 
 export function UserSignUpForm({ updateData }: { updateData?: User }) {
   const { mutateAsync: createUser } = useCreateUser();
@@ -28,6 +30,7 @@ export function UserSignUpForm({ updateData }: { updateData?: User }) {
   const [image, setImage] = useState(updateData?.image ?? "");
   const [name, setName] = useState(updateData?.name ?? "Lorem Ipsum");
   const [email, setEmail] = useState(updateData?.email ?? "user@petmate.com");
+  const [changePassword, setChangePassword] = useState<boolean>(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof UserCreateSchema>>({
@@ -44,13 +47,23 @@ export function UserSignUpForm({ updateData }: { updateData?: User }) {
   async function onSubmit(data: z.infer<typeof UserCreateSchema>) {
     try {
       if (updateData) {
+        type DataChanges = {
+          image?: string | null;
+          name: string;
+          password?: string;
+        };
+
+        const newData: DataChanges = {
+          image: data.image,
+          name: data.name,
+        };
+
+        if (data.password?.length && changePassword) {
+          newData.password = data.password;
+        }
+
         await updateUser({
-          data: {
-            image: data.image,
-            name: data.name,
-            password: data.password ?? undefined,
-            role: "USER",
-          },
+          data: newData,
           where: {
             id: updateData.id,
           },
@@ -167,6 +180,7 @@ export function UserSignUpForm({ updateData }: { updateData?: User }) {
         <FormField
           control={form.control}
           name="password"
+          disabled={updateData && !changePassword}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
@@ -184,12 +198,22 @@ export function UserSignUpForm({ updateData }: { updateData?: User }) {
             </FormItem>
           )}
         />
+        {updateData && (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              onCheckedChange={(value) => setChangePassword(Boolean(value))}
+              value={"true"}
+              id="show-password"
+            />
+            <Label htmlFor="show-password">Change Password</Label>
+          </div>
+        )}
 
         <Button
           disabled={!image.length || !form.formState.isValid}
           className="w-full"
         >
-          Sign Up
+          {updateData ? "Save Changes" : "Sign Up"}
         </Button>
       </form>
     </Form>

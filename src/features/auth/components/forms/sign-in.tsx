@@ -17,6 +17,7 @@ import { Separator } from "~/components/ui/separator";
 import { Button } from "~/components/ui/button";
 import { UserCreateSchema } from "@zenstackhq/runtime/zod/models";
 import { FaGoogle } from "react-icons/fa6";
+import { toast } from "sonner";
 
 const SignInForm = () => {
   const router = useRouter();
@@ -31,14 +32,21 @@ const SignInForm = () => {
   });
 
   async function onSubmit(data: z.infer<typeof UserCreateSchema>) {
-    const auth = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    });
-
-    if (auth?.ok) {
+    try {
+      const auth = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+      console.log(auth);
+      if (auth?.error) {
+        throw new Error(auth.error);
+      }
+      toast.success("Welcome to petmate!");
       router.push(`/`);
+    } catch (error) {
+      console.log(error);
+      toast.error("Login failed");
     }
   }
 
