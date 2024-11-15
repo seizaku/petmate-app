@@ -17,9 +17,6 @@ db.sqlite
 /out/
 next-env.d.ts
 
-# zenstack hooks
-/src/lib/hooks/
-
 # production
 /build
 
