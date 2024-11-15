@@ -1,9 +1,8 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pet } from "@prisma/client";
+import { type Pet } from "@prisma/client";
 import { PetCreateSchema } from "@zenstackhq/runtime/zod/models";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -48,8 +47,6 @@ export function PetForm({
   const [name, setName] = useState<string | null>(
     updateData?.name ?? "Pet Name",
   );
-
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof PetCreateSchema>>({
     resolver: zodResolver(PetCreateSchema),
@@ -105,7 +102,6 @@ export function PetForm({
       }
 
       toast.success("Saved!");
-      router.push("/user/pets");
       closeFn();
     } catch (error) {
       console.error(error);
