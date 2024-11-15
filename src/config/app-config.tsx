@@ -32,15 +32,27 @@ export const appConfig = {
       provider: [
         {
           title: "My Appointments",
-          description: "Keep track of your appointments.",
+          description: "View and manage upcoming appointments.",
           href: "/business/appointments",
           icon: <FaCalendar className="h-5 w-5 text-primary" />,
         },
         {
           title: "Client History",
-          description: "Appointment history",
+          description: "Review past client appointments.",
           href: "/business/history",
           icon: <FaClock className="h-5 w-5 text-primary" />,
+        },
+        {
+          title: "Services & Pricing",
+          icon: <FaDollarSign className="text-primary" />,
+          description: "Set and manage your service rates.",
+          href: "/business/services",
+        },
+        {
+          title: "Time Slots",
+          icon: <FaClock className="text-primary" />,
+          description: "Define available time slots for bookings.",
+          href: "/business/timeslots",
         },
       ],
     },
@@ -75,7 +87,7 @@ export const appConfig = {
         icon: <FaCalendar className="text-primary" />,
       },
       {
-        title: "Client History",
+        title: "History",
         description: "Appointment history",
         href: "/business/history",
         icon: <FaClock className="h-5 w-5 text-primary" />,
@@ -87,6 +99,11 @@ export const appConfig = {
       title: "Services & Pricing",
       icon: <FaDollarSign className="text-primary" />,
       href: "/business/services",
+    },
+    {
+      title: "Time Slots",
+      icon: <FaClock className="text-primary" />,
+      href: "/business/timeslots",
     },
   ],
   legalInformation: [
