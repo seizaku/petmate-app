@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -10,6 +12,8 @@ import { AppContainer, AppNavbar } from "~/components/app";
 import { env } from "~/env";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useFindFirstUser, useFindManyBusiness } from "~/lib/hooks";
+import { type Business } from "@prisma/client";
+import { getUserLocation, sortByNearest } from "~/features/gmap/lib/geocoding";
 
 type Message = {
   id: number;
@@ -19,19 +23,12 @@ type Message = {
 
 export default function Component() {
   const { data: user } = useFindFirstUser();
-  const { data: business } = useFindManyBusiness({
-    select: {
-      businessName: true,
-      phoneNumber: true,
-      address: true,
-      services: {
-        include: {
-          variants: true,
-        },
-      },
-    },
+  const [location, setLocation] = useState<any>();
+  const [nearest, setNearest] = useState<Business[]>();
+  const { data: business, status } = useFindManyBusiness({
+    include: { services: true },
+    take: 5,
   });
-
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -49,6 +46,27 @@ export default function Component() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    setNearest(
+      sortByNearest(
+        location ?? { lat: "6.9076158", lng: "122.0681293" },
+        business as Business[],
+      ),
+    );
+  }, [status]);
+
+  useEffect(() => {
+    // Example usage
+    getUserLocation()
+      .then((location) => {
+        console.log("User Location:", location); // { lat, long }
+        setLocation(location as { lat: number; lng: number });
+      })
+      .catch((error) => {
+        console.error("Error:", error); // Handle errors (e.g., permission denied, unavailable)
+      });
+  }, []);
+
   const handleSend = async () => {
     setNew(false);
     if (input.trim()) {
@@ -58,7 +76,7 @@ export default function Component() {
         sender: "user",
       };
       setMessages([...messages, newMessage]);
-      const genAI = new GoogleGenerativeAI(env.NEXT_PUBLIC_GOOGLE_API);
+      const genAI = new GoogleGenerativeAI(env.NEXT_PUBLIC_GEMINI_API);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent([
         `
@@ -67,6 +85,9 @@ export default function Component() {
         However, do not diagnose, prescribe treatments, or provide medical advice. 
         If a question indicates a critical or specific health issue, respond with, “I’m here to provide general information, but for this concern, please consult a veterinarian as soon as possible.” 
         Maintain a warm, supportive tone, and keep responses brief and clear.  
+
+        If the user asks for the nearest vets, these are the nearest vets based on his gps:
+        ${JSON.stringify(nearest, null, 2)}
 
         User question: ${input}
       `,
