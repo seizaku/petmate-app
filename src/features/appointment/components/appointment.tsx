@@ -108,6 +108,11 @@ export default function Appointment({
           ))}
         </CardHeader>
       </Card>
+      <Card className="mb-4">
+        <CardHeader>
+          <p>{appointment?.note}</p>
+        </CardHeader>
+      </Card>
       <Card className="bg-gradient mb-4 bg-gradient-to-r from-primary via-primary/90 to-primary/70 text-white">
         <CardHeader>
           <CardTitle>
