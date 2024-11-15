@@ -25,6 +25,8 @@ import { Card, CardContent } from "~/components/ui/card";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Textarea } from "~/components/ui/textarea";
+import { GoogleMapEmbed } from "~/features/gmap/components/map-embed";
+import { geocode } from "~/features/gmap/lib/geocoding";
 
 const BusinessSignUpForm = () => {
   const { mutateAsync: createUser } = useCreateUser();
@@ -54,12 +56,16 @@ const BusinessSignUpForm = () => {
       password: "",
       ownerId: "",
       businessId: "",
+      latitude: "",
+      longitude: "",
     },
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      await createUser({
+      const coordinates = await geocode(data?.address);
+      console.log(coordinates);
+      const result = await createUser({
         data: {
           name: data.name,
           email: data.email,
@@ -73,6 +79,8 @@ const BusinessSignUpForm = () => {
               businessName: data.businessName,
               phoneNumber: data.phoneNumber,
               address: data.address,
+              latitude: coordinates.lat,
+              longitude: coordinates.lng,
               documents: {
                 create: {
                   license: data.license,
@@ -84,6 +92,8 @@ const BusinessSignUpForm = () => {
           },
         },
       });
+
+      console.log(result);
 
       toast.success("Welcome to PetMate!");
       router.push("/sign-in");
@@ -215,6 +225,8 @@ const BusinessSignUpForm = () => {
                 </FormItem>
               )}
             />
+
+            <GoogleMapEmbed address={address ?? "Zamboanga City"} />
 
             <FormField
               control={form.control}
