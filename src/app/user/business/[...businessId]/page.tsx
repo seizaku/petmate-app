@@ -17,7 +17,7 @@ export default async function BusinessPage({
 
   return (
     <AppContainer>
-      <AppNavbar title="Service Provider" href="/user/home" />
+      <AppNavbar title="Service Provider" href="/user/search" />
 
       <Business businessId={id[0]!} />
     </AppContainer>
