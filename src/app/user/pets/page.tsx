@@ -10,7 +10,6 @@ import {
 import { FaMagnifyingGlass, FaPen, FaPlus, FaX } from "react-icons/fa6";
 import { Input } from "~/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { useRouter } from "next/navigation";
 import { useDeletePet, useFindFirstUser } from "~/lib/hooks";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 import { AlertDialogHeader } from "~/components/ui/alert-dialog";
