@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { getMonth, getYear } from "date-fns";
@@ -7,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useFindFirstUser } from "~/lib/hooks";
 
 const TotalRevenue = () => {
-  const { data: user, status } = useFindFirstUser({
+  const { data: user } = useFindFirstUser({
     include: {
       business: {
         include: {
@@ -47,22 +49,22 @@ const TotalRevenue = () => {
       );
   };
 
-  // State to hold the calculated monthly revenue
-  const [monthlyRevenue, setMonthlyRevenue] = useState(0);
+  // // State to hold the calculated monthly revenue
+  // const [monthlyRevenue, setMonthlyRevenue] = useState(0);
 
-  // Calculate monthly revenue for the current month and year
-  useEffect(() => {
-    if (user?.business?.appointments) {
-      const currentYear = getYear(new Date());
-      const currentMonth = getMonth(new Date());
-      const revenue = calculateMonthlyRevenue(
-        user.business.appointments,
-        currentYear,
-        currentMonth,
-      );
-      setMonthlyRevenue(revenue);
-    }
-  }, [user]);
+  // // Calculate monthly revenue for the current month and year
+  // useEffect(() => {
+  //   if (user?.business?.appointments) {
+  //     const currentYear = getYear(new Date());
+  //     const currentMonth = getMonth(new Date());
+  //     const revenue = calculateMonthlyRevenue(
+  //       user.business.appointments,
+  //       currentYear,
+  //       currentMonth,
+  //     );
+  //     setMonthlyRevenue(revenue);
+  //   }
+  // }, [user]);
 
   const totalPriceSum = useMemo(() => {
     return (user?.business?.appointments ?? []).reduce((sum, appointment) => {

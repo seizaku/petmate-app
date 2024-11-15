@@ -3,13 +3,12 @@ import React, { useState } from "react";
 import { AppContainer, AppNavbar, AppBottomNav } from "~/components/app";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { FaPen, FaPlus, FaTrash, FaX } from "react-icons/fa6";
+import { FaPen, FaPlus, FaTrash } from "react-icons/fa6";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTitle,
-  DialogTrigger,
 } from "~/components/ui/dialog";
 import { AlertDialogHeader } from "~/components/ui/alert-dialog";
 import { Label } from "~/components/ui/label";

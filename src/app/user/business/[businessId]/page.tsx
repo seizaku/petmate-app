@@ -3,23 +3,15 @@ import { AppContainer, AppNavbar } from "~/components/app";
 import { Business } from "~/features/business/components/business";
 
 interface BusinessPage {
-  params: {
-    businessId: string[];
-  };
+  params: Promise<{ businessId: string }>;
 }
 
-export default async function BusinessPage({
-  params,
-}: {
-  params: { businessId: Promise<string[]> };
-}) {
-  const id = await params.businessId;
-
+export default async function BusinessPage({ params }: BusinessPage) {
   return (
     <AppContainer>
       <AppNavbar title="Service Provider" href="/user/search" />
 
-      <Business businessId={id[0]!} />
+      <Business businessId={(await params).businessId} />
     </AppContainer>
   );
 }

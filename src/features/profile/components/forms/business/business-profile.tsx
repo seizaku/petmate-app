@@ -26,6 +26,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Textarea } from "~/components/ui/textarea";
+import { geocode } from "~/features/gmap/lib/geocoding";
 
 const FormSchema = UserCreateSchema.merge(BusinessSchema).merge(
   BusinessDocumentCreateSchema,
@@ -88,6 +89,9 @@ const BusinessProfileForm = () => {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
+      const coordinates = await geocode(data?.address);
+
+      console.log(coordinates);
       await createUser({
         data: {
           name: data.name,
@@ -102,6 +106,8 @@ const BusinessProfileForm = () => {
               businessName: data.businessName,
               phoneNumber: data.phoneNumber,
               address: data.address,
+              latitude: coordinates.lat,
+              longitude: coordinates.lng,
               documents: {
                 create: {
                   license: data.license,

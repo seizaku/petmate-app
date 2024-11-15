@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { AppContainer, AppBottomNav, AppNavbar } from "~/components/app";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
-import { FaClock, FaPlus, FaX } from "react-icons/fa6";
+import { FaClock, FaPlus } from "react-icons/fa6";
 import { useDeleteTimeSlot, useFindFirstUser } from "~/lib/hooks";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 import { AlertDialogHeader } from "~/components/ui/alert-dialog";
