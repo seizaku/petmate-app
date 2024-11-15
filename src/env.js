@@ -25,7 +25,8 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    NEXT_PUBLIC_GOOGLE_API: z.string(),
+    NEXT_PUBLIC_GEMINI_API: z.string(),
+    NEXT_PUBLIC_GOOGLE_MAP_API: z.string(),
   },
 
   /**
@@ -38,7 +39,8 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
-    NEXT_PUBLIC_GOOGLE_API: process.env.NEXT_PUBLIC_GOOGLE_API
+    NEXT_PUBLIC_GEMINI_API: process.env.NEXT_PUBLIC_GEMINI_API,
+    NEXT_PUBLIC_GOOGLE_MAP_API: process.env.NEXT_PUBLIC_GOOGLE_MAP_API
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
