@@ -196,7 +196,6 @@ model TimeSlot {
     business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId String
 
-    @@unique([time, businessId])  // Enforces unique time per business
     @@allow('all', true)
 }
 
