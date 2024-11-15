@@ -25,6 +25,7 @@ export default function NotificationsPage() {
 
       <div className="grid gap-2">
         {user?.notifications
+          .filter((value) => value.userMessage != null)
           .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
           .map((notification) => (
             <Card key={notification.id} className="shadow-none">
