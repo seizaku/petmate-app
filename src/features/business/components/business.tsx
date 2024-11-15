@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import Image from "next/image";
 import {
   useCreateAppointment,
+  useCreateNotification,
   useFindFirstBusiness,
   useFindFirstUser,
 } from "~/lib/hooks";
@@ -23,16 +24,7 @@ import {
 import { Calendar } from "~/components/ui/calendar";
 import { GoogleMapEmbed } from "~/features/gmap/components/page";
 import { Checkbox } from "~/components/ui/checkbox";
-
-const timeSlots = [
-  "9:00 AM",
-  "10:00 AM",
-  "11:00 AM",
-  "1:00 PM",
-  "2:00 PM",
-  "3:00 PM",
-  "4:00 PM",
-];
+import { Textarea } from "~/components/ui/textarea";
 
 const Business = ({ businessId }: { businessId: string }) => {
   const { data: user } = useFindFirstUser({
@@ -47,6 +39,7 @@ const Business = ({ businessId }: { businessId: string }) => {
           variants: true,
         },
       },
+      timeslots: true,
     },
     where: {
       id: businessId,
@@ -61,8 +54,10 @@ const Business = ({ businessId }: { businessId: string }) => {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedTime, setSelectedTime] = useState<string | undefined>();
   const [selectedPet, setSelectedPet] = useState<string | undefined>();
+  const [note, setNote] = useState<string | undefined>();
 
   const { mutateAsync: createAppointment } = useCreateAppointment();
+  const { mutateAsync: createNotification } = useCreateNotification();
 
   const toggleService = (id: string) => {
     setSelectedServices((prevSelected) => {
@@ -93,9 +88,17 @@ const Business = ({ businessId }: { businessId: string }) => {
           datetime: combineDateAndTime(selectedDate!, selectedTime!),
           status: "PENDING",
           totalPrice,
+          note,
           pet: {
             connect: {
               id: parseInt(selectedPet!),
+            },
+          },
+          services: {
+            createMany: {
+              data: selectedServices.map((variantId) => ({
+                variantId,
+              })),
             },
           },
           business: {
@@ -106,11 +109,29 @@ const Business = ({ businessId }: { businessId: string }) => {
         },
       });
 
+      await createNotification({
+        data: {
+          userMessage: `Your appointment is now pending`,
+          businessMessage: `${user?.name} has booked an appointment.`,
+          type: "INFO",
+          user: {
+            connect: {
+              id: user?.id,
+            },
+          },
+          business: {
+            connect: {
+              id: business?.id,
+            },
+          },
+        },
+      });
+
       toast.success("Appointment created");
       router.push("/user/appointments");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create account");
+      toast.error("Failed to process appointment");
     }
   }
 
@@ -192,12 +213,13 @@ const Business = ({ businessId }: { businessId: string }) => {
         </TabsContent>
       </Tabs>
 
-      <Card className="mb-12">
+      <Card className="mb-4">
         <CardHeader>
           <Calendar
             mode="single"
             selected={selectedDate}
             onSelect={setSelectedDate}
+            fromDate={new Date()}
             className="flex h-full w-full"
             classNames={{
               months:
@@ -215,16 +237,25 @@ const Business = ({ businessId }: { businessId: string }) => {
               <SelectValue placeholder="Select a time slot" />
             </SelectTrigger>
             <SelectContent>
-              {timeSlots.map((slot) => (
-                <SelectItem key={slot} value={slot}>
-                  {slot}
+              {business?.timeslots.map((slot) => (
+                <SelectItem key={slot.id} value={slot.time}>
+                  <span className="text-sm">{slot.time}</span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Select value={selectedPet} onValueChange={setSelectedPet} required>
+          <Select
+            value={selectedPet}
+            disabled={!user?.pets.length}
+            onValueChange={setSelectedPet}
+            required
+          >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select pet" />
+              <SelectValue
+                placeholder={
+                  user?.pets.length ? "Select pet" : "You have no pets yet."
+                }
+              />
             </SelectTrigger>
             <SelectContent>
               {user?.pets.map((pet) => (
@@ -235,6 +266,17 @@ const Business = ({ businessId }: { businessId: string }) => {
             </SelectContent>
           </Select>
         </CardContent>
+      </Card>
+
+      <Card className="mb-12">
+        <CardHeader>
+          <CardTitle className="mb-2">Note</CardTitle>
+          <Textarea
+            rows={5}
+            placeholder="Any additional information we should know beforehand?"
+            onChange={(e) => setNote(e.currentTarget.value)}
+          ></Textarea>
+        </CardHeader>
       </Card>
 
       <Card className="fixed bottom-0 left-0 w-full rounded-b-none">
