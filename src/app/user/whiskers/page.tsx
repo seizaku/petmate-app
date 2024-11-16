@@ -83,7 +83,7 @@ export default function Component() {
       };
       setMessages([...messages, newMessage]);
       const genAI = new GoogleGenerativeAI(env.NEXT_PUBLIC_GEMINI_API);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
       const result = await model.generateContent([
         `
         You are Whiskers AI, a chatbot created by PetMate to provide general information about pet care and wellness.
